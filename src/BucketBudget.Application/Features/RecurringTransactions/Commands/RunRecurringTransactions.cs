@@ -55,10 +55,10 @@ public class RunRecurringTransactionsCommandHandler : IRequestHandler<RunRecurri
 
     private static DateOnly AdvanceDate(DateOnly date, RecurrenceFrequency frequency) => frequency switch
     {
+        RecurrenceFrequency.Daily => date.AddDays(1),
         RecurrenceFrequency.Weekly => date.AddDays(7),
         RecurrenceFrequency.Biweekly => date.AddDays(14),
         RecurrenceFrequency.Monthly => date.AddMonths(1),
-        RecurrenceFrequency.Quarterly => date.AddMonths(3),
         RecurrenceFrequency.Yearly => date.AddYears(1),
         _ => date.AddMonths(1)
     };
