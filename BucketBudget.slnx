@@ -4,5 +4,7 @@
     <Project Path="src/BucketBudget.Application/BucketBudget.Application.csproj" />
     <Project Path="src/BucketBudget.Domain/BucketBudget.Domain.csproj" />
     <Project Path="src/BucketBudget.Infrastructure/BucketBudget.Infrastructure.csproj" />
+    <Project Path="src/BucketBudget.Client/BucketBudget.Client.csproj" />
+    <Project Path="src/BucketBudget.Cli/BucketBudget.Cli.csproj" />
   </Folder>
 </Solution>
