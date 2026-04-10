@@ -16,3 +16,7 @@ Thumbs.db
 .beads/
 .runtime/
 .claude/
+
+## Frontend
+src/BucketBudget.Web/node_modules/
+src/BucketBudget.Web/dist/
