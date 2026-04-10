@@ -18,7 +18,13 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .HasForeignKey(t => t.BucketId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        builder.HasOne(t => t.ExchangeRate)
+            .WithMany()
+            .HasForeignKey(t => t.ExchangeRateId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasIndex(t => t.Date);
         builder.HasIndex(t => t.AccountId);
+        builder.HasIndex(t => t.TransferPairId);
     }
 }

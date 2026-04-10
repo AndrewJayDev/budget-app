@@ -1,4 +1,5 @@
 using BucketBudget.Application.Interfaces;
+using BucketBudget.Infrastructure.ExchangeRates;
 using BucketBudget.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -26,6 +27,17 @@ public static class DependencyInjection
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<BudgetDbContext>();
+
+        // Exchange rate polling
+        services.AddHttpClient<DolarApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://dolarapi.com/");
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
+
+        services.AddSingleton<ExchangeRatePollingService>();
+        services.AddHostedService(sp => sp.GetRequiredService<ExchangeRatePollingService>());
+        services.AddSingleton<IExchangeRatePoller>(sp => sp.GetRequiredService<ExchangeRatePollingService>());
 
         return services;
     }
