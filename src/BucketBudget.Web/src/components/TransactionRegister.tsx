@@ -65,7 +65,9 @@ export function TransactionRegister({
 }: TransactionRegisterProps) {
   const [editing, setEditing] = useState<EditState | null>(null)
   const [saving, setSaving] = useState(false)
+  const [opError, setOpError] = useState<string | null>(null)
   const [splitTarget, setSplitTarget] = useState<TransactionDto | null>(null)
+  const [deletePending, setDeletePending] = useState<string | null>(null)
   const [addingNew, setAddingNew] = useState(false)
   const payeeRef = useRef<HTMLInputElement>(null)
 
@@ -133,21 +135,23 @@ export function TransactionRegister({
       }
       setEditing(null)
       setAddingNew(false)
+      setOpError(null)
       onChanged()
     } catch (e) {
-      console.error(e)
+      setOpError(e instanceof Error ? e.message : 'Save failed')
     } finally {
       setSaving(false)
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this transaction?')) return
+    setDeletePending(null)
     try {
       await deleteTransaction(id)
+      setOpError(null)
       onChanged()
     } catch (e) {
-      console.error(e)
+      setOpError(e instanceof Error ? e.message : 'Delete failed')
     }
   }
 
@@ -161,9 +165,10 @@ export function TransactionRegister({
         memo: tx.memo ?? null,
         isCleared: !tx.isCleared,
       })
+      setOpError(null)
       onChanged()
     } catch (e) {
-      console.error(e)
+      setOpError(e instanceof Error ? e.message : 'Toggle failed')
     }
   }
 
@@ -189,6 +194,14 @@ export function TransactionRegister({
 
   return (
     <div className="space-y-2">
+      {/* Error banner */}
+      {opError && (
+        <div className="flex items-center justify-between gap-2 text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2 text-sm">
+          <span>{opError}</span>
+          <button onClick={() => setOpError(null)} className="text-red-400 hover:text-red-600">✕</button>
+        </div>
+      )}
+
       {/* Balance bar */}
       <div className="flex items-center gap-6 px-2 py-2 bg-white rounded-lg border text-sm">
         <div>
@@ -313,39 +326,61 @@ export function TransactionRegister({
                     />
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {!reconcileMode && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-gray-400 hover:text-blue-500"
-                            onClick={(e) => { e.stopPropagation(); startEdit(tx) }}
-                            title="Edit"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-gray-400 hover:text-purple-500"
-                            onClick={(e) => { e.stopPropagation(); setSplitTarget(tx) }}
-                            title="Split"
-                          >
-                            <Split className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-gray-400 hover:text-red-500"
-                            onClick={(e) => { e.stopPropagation(); handleDelete(tx.id) }}
-                            title="Delete"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                    {deletePending === tx.id ? (
+                      <div className="flex items-center gap-1 text-xs">
+                        <span className="text-red-600 text-xs">Delete?</span>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="h-5 px-1.5 text-xs"
+                          onClick={(e) => { e.stopPropagation(); handleDelete(tx.id) }}
+                        >
+                          Yes
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-5 px-1.5 text-xs"
+                          onClick={(e) => { e.stopPropagation(); setDeletePending(null) }}
+                        >
+                          No
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!reconcileMode && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-gray-400 hover:text-blue-500"
+                              onClick={(e) => { e.stopPropagation(); startEdit(tx) }}
+                              title="Edit"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-gray-400 hover:text-purple-500"
+                              onClick={(e) => { e.stopPropagation(); setSplitTarget(tx) }}
+                              title="Split"
+                            >
+                              <Split className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-gray-400 hover:text-red-500"
+                              onClick={(e) => { e.stopPropagation(); setDeletePending(tx.id) }}
+                              title="Delete"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               )
@@ -368,6 +403,7 @@ export function TransactionRegister({
           open={!!splitTarget}
           onClose={() => setSplitTarget(null)}
           accountId={accountId}
+          originalId={splitTarget.id}
           date={splitTarget.date}
           payee={splitTarget.payee}
           totalMilliunits={splitTarget.amountMilliunits}

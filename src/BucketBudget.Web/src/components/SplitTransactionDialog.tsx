@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { createTransaction, type CreateTransactionData, type BucketDto } from '@/lib/api'
+import { createTransaction, deleteTransaction, type CreateTransactionData, type BucketDto } from '@/lib/api'
 import { parseAmountToMilliunits, formatMilliunits } from '@/lib/utils'
 
 interface SplitLine {
@@ -17,6 +17,8 @@ interface SplitTransactionDialogProps {
   open: boolean
   onClose: () => void
   accountId: string
+  /** If set, this transaction is deleted after the split lines are created */
+  originalId?: string
   date: string
   payee: string
   totalMilliunits: number
@@ -29,6 +31,7 @@ export function SplitTransactionDialog({
   open,
   onClose,
   accountId,
+  originalId,
   date,
   payee,
   totalMilliunits,
@@ -90,6 +93,8 @@ export function SplitTransactionDialog({
         }
         await createTransaction(tx)
       }
+      // Delete the original transaction now that it has been replaced by split lines
+      if (originalId) await deleteTransaction(originalId)
       onSaved()
       onClose()
     } catch (e) {
