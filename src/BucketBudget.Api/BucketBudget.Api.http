@@ -1,0 +1,6 @@
+@BucketBudget.Api_HostAddress = http://localhost:5068
+
+GET {{BucketBudget.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

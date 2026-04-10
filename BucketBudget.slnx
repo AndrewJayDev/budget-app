@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BucketBudget.Api/BucketBudget.Api.csproj" />
+    <Project Path="src/BucketBudget.Application/BucketBudget.Application.csproj" />
+    <Project Path="src/BucketBudget.Domain/BucketBudget.Domain.csproj" />
+    <Project Path="src/BucketBudget.Infrastructure/BucketBudget.Infrastructure.csproj" />
+  </Folder>
+</Solution>
