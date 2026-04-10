@@ -55,6 +55,7 @@ app.MapAuthEndpoints();
 app.MapAccountEndpoints();
 app.MapTransactionEndpoints();
 app.MapBudgetEndpoints();
+app.MapRecurringTransactionEndpoints();
 
 // --- Exchange Rate Endpoints ---
 

@@ -14,6 +14,7 @@ public class RecurringTransaction
     public DateOnly StartDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public DateOnly? NextOccurrence { get; set; }
+    public bool AutoPost { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

@@ -1,6 +1,7 @@
 using BucketBudget.Application.Interfaces;
 using BucketBudget.Infrastructure.ExchangeRates;
 using BucketBudget.Infrastructure.Persistence;
+using BucketBudget.Infrastructure.RecurringTransactions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,9 @@ public static class DependencyInjection
         services.AddSingleton<ExchangeRatePollingService>();
         services.AddHostedService(sp => sp.GetRequiredService<ExchangeRatePollingService>());
         services.AddSingleton<IExchangeRatePoller>(sp => sp.GetRequiredService<ExchangeRatePollingService>());
+
+        // Recurring transaction auto-posting
+        services.AddHostedService<RecurringTransactionPostingService>();
 
         return services;
     }
