@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Upload, Scale, Plus, LogOut } from 'lucide-react'
+import { Upload, Scale, Plus, LogOut, BarChart2 } from 'lucide-react'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useTransactions } from '@/hooks/useTransactions'
 import { useBuckets } from '@/hooks/useBuckets'
 import { TransactionRegister } from '@/components/TransactionRegister'
 import { ReconcilePanel } from '@/components/ReconcilePanel'
 import { CsvImportDialog } from '@/components/CsvImportDialog'
+import { ReportsPage } from '@/pages/ReportsPage'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createAccount } from '@/lib/api'
@@ -20,6 +21,7 @@ interface AccountRegisterPageProps {
 export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
   const { accounts, loading: accountsLoading, reload: reloadAccounts } = useAccounts()
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [page, setPage] = useState<'accounts' | 'reports'>('accounts')
   const { transactions, loading: txLoading, reload: reloadTx } = useTransactions(selectedId)
   const { buckets } = useBuckets()
 
@@ -60,6 +62,18 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
+          <button
+            onClick={() => setPage('reports')}
+            className={cn(
+              'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2 mb-2',
+              page === 'reports'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+            )}
+          >
+            <BarChart2 className="h-4 w-4 shrink-0" />
+            Reports
+          </button>
           <p className="text-xs font-semibold text-gray-400 px-2 py-1 uppercase tracking-wider">Accounts</p>
 
           {accountsLoading ? (
@@ -68,10 +82,10 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
             openAccounts.map(account => (
               <button
                 key={account.id}
-                onClick={() => { setSelectedId(account.id); setReconcileMode(false) }}
+                onClick={() => { setSelectedId(account.id); setReconcileMode(false); setPage('accounts') }}
                 className={cn(
                   'w-full text-left px-3 py-2 rounded-md text-sm transition-colors',
-                  selectedId === account.id
+                  page === 'accounts' && selectedId === account.id
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                 )}
@@ -99,10 +113,10 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
               {closedAccounts.map(account => (
                 <button
                   key={account.id}
-                  onClick={() => { setSelectedId(account.id); setReconcileMode(false) }}
+                  onClick={() => { setSelectedId(account.id); setReconcileMode(false); setPage('accounts') }}
                   className={cn(
                     'w-full text-left px-3 py-2 rounded-md text-sm transition-colors opacity-50',
-                    selectedId === account.id ? 'bg-gray-600 text-white' : 'text-gray-400 hover:bg-gray-700'
+                    page === 'accounts' && selectedId === account.id ? 'bg-gray-600 text-white' : 'text-gray-400 hover:bg-gray-700'
                   )}
                 >
                   <span className="truncate">{account.name}</span>
@@ -164,7 +178,9 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {selectedAccount ? (
+        {page === 'reports' ? (
+          <ReportsPage />
+        ) : selectedAccount ? (
           <>
             {/* Header */}
             <div className="bg-white border-b px-6 py-3 flex items-center justify-between shrink-0">
