@@ -1,10 +1,11 @@
 using BucketBudget.Application.Interfaces;
 using BucketBudget.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BucketBudget.Infrastructure.Persistence;
 
-public class BudgetDbContext : DbContext, IBudgetDbContext
+public class BudgetDbContext : IdentityDbContext<ApplicationUser>, IBudgetDbContext
 {
     public BudgetDbContext(DbContextOptions<BudgetDbContext> options) : base(options) { }
 
@@ -18,6 +19,7 @@ public class BudgetDbContext : DbContext, IBudgetDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BudgetDbContext).Assembly);
     }
 
