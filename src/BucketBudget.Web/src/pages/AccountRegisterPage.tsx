@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Upload, Scale, Plus, LogOut, BarChart2 } from 'lucide-react'
+import { Upload, Scale, Plus, LogOut, BarChart2, Wallet } from 'lucide-react'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useTransactions } from '@/hooks/useTransactions'
 import { useBuckets } from '@/hooks/useBuckets'
@@ -7,6 +7,7 @@ import { TransactionRegister } from '@/components/TransactionRegister'
 import { ReconcilePanel } from '@/components/ReconcilePanel'
 import { CsvImportDialog } from '@/components/CsvImportDialog'
 import { ReportsPage } from '@/pages/ReportsPage'
+import { BudgetPage } from '@/pages/BudgetPage'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createAccount } from '@/lib/api'
@@ -21,7 +22,7 @@ interface AccountRegisterPageProps {
 export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
   const { accounts, loading: accountsLoading, reload: reloadAccounts } = useAccounts()
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [page, setPage] = useState<'accounts' | 'reports'>('accounts')
+  const [page, setPage] = useState<'accounts' | 'reports' | 'budget'>('accounts')
   const { transactions, loading: txLoading, reload: reloadTx } = useTransactions(selectedId)
   const { buckets } = useBuckets()
 
@@ -62,6 +63,18 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
+          <button
+            onClick={() => setPage('budget')}
+            className={cn(
+              'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2',
+              page === 'budget'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+            )}
+          >
+            <Wallet className="h-4 w-4 shrink-0" />
+            Budget
+          </button>
           <button
             onClick={() => setPage('reports')}
             className={cn(
@@ -178,7 +191,9 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {page === 'reports' ? (
+        {page === 'budget' ? (
+          <BudgetPage />
+        ) : page === 'reports' ? (
           <ReportsPage />
         ) : selectedAccount ? (
           <>

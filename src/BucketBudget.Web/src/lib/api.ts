@@ -48,14 +48,18 @@ export interface TransactionDto {
 
 export interface BucketDto {
   id: string
-  bucketGroupId: string
+  bucketGroupId?: string
   name: string
   sortOrder: number
+  allocatedMilliunits?: number
+  activityMilliunits?: number
+  availableMilliunits?: number
 }
 
 export interface BucketGroupDto {
   id: string
   name: string
+  sortOrder?: number
   buckets: BucketDto[]
 }
 
@@ -177,4 +181,12 @@ export interface MonthBudgetDto {
 export async function getMonthBudget(year: number, month: number): Promise<MonthBudgetDto> {
   const m = String(month).padStart(2, '0')
   return request<MonthBudgetDto>(`/months/${year}-${m}`)
+}
+
+export async function upsertBucketAllocation(year: number, month: number, bucketId: string, allocatedMilliunits: number): Promise<void> {
+  const m = String(month).padStart(2, '0')
+  return request<void>(`/months/${year}-${m}/buckets/${bucketId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ allocatedMilliunits }),
+  })
 }
