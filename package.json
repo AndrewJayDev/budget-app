@@ -1,0 +1,15 @@
+{
+  "name": "bucketbudget",
+  "private": true,
+  "scripts": {
+    "dev": "npm run db:up && npm run db:migrate && concurrently --names \"api,web\" --prefix-colors \"blue,green\" \"npm run api\" \"npm run web\"",
+    "db:up": "(docker start bucketbudget-db 2>/dev/null || docker run -d --name bucketbudget-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=bucketbudget -p 5432:5432 postgres:16) && npx wait-on tcp:localhost:5432 -t 30000",
+    "db:migrate": "dotnet ef database update --project src/BucketBudget.Infrastructure --startup-project src/BucketBudget.Api",
+    "api": "dotnet run --project src/BucketBudget.Api --launch-profile https",
+    "web": "npm install --prefix src/BucketBudget.Web && npm run dev --prefix src/BucketBudget.Web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "wait-on": "^8.0.1"
+  }
+}
