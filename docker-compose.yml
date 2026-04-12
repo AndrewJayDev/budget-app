@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bucketbudget
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ./src
+      dockerfile: BucketBudget.Api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__BudgetDb: "Host=db;Port=5432;Database=bucketbudget;Username=postgres;Password=${DB_PASSWORD:-postgres}"
+      Jwt__SecretKey: ${JWT_SECRET_KEY:-change-this-in-production-min-32-chars!!}
+      Jwt__Issuer: BucketBudget
+      Jwt__Audience: BucketBudgetUsers
+      Jwt__ExpiryMinutes: 60
+    ports:
+      - "8080:8080"
+
+  web:
+    build:
+      context: ./src/BucketBudget.Web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+
+volumes:
+  pgdata:
