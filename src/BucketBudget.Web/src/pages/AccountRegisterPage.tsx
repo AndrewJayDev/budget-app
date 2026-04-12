@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Upload, Scale, Plus, LogOut, BarChart2, Wallet } from 'lucide-react'
+import { Upload, Scale, Plus, LogOut, BarChart2, Wallet, ChevronDown } from 'lucide-react'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useTransactions } from '@/hooks/useTransactions'
 import { useBuckets } from '@/hooks/useBuckets'
@@ -29,6 +29,7 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
   const [reconcileMode, setReconcileMode] = useState(false)
   const [csvOpen, setCsvOpen] = useState(false)
   const [newAccountName, setNewAccountName] = useState('')
+  const [newAccountCurrency, setNewAccountCurrency] = useState('ARS')
   const [showNewAccount, setShowNewAccount] = useState(false)
 
   const selectedAccount = accounts.find(a => a.id === selectedId) ?? null
@@ -36,10 +37,11 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
   async function handleCreateAccount() {
     if (!newAccountName.trim()) return
     try {
-      const { id } = await createAccount({ name: newAccountName.trim(), currencyCode: 'USD' })
+      const { id } = await createAccount({ name: newAccountName.trim(), currencyCode: newAccountCurrency })
       await reloadAccounts()
       setSelectedId(id)
       setNewAccountName('')
+      setNewAccountCurrency('ARS')
       setShowNewAccount(false)
     } catch (e) {
       console.error(e)
@@ -152,6 +154,22 @@ export function AccountRegisterPage({ onLogout }: AccountRegisterPageProps) {
                 }}
                 autoFocus
               />
+              <div className="relative">
+                <select
+                  value={newAccountCurrency}
+                  onChange={e => setNewAccountCurrency(e.target.value)}
+                  className="w-full bg-gray-800 text-white text-sm rounded px-2 py-1.5 border border-gray-600 focus:outline-none focus:border-blue-400 appearance-none pr-7"
+                >
+                  <option value="ARS">ARS – Peso argentino</option>
+                  <option value="USD">USD – US Dollar</option>
+                  <option value="EUR">EUR – Euro</option>
+                  <option value="BRL">BRL – Real brasileño</option>
+                  <option value="UYU">UYU – Peso uruguayo</option>
+                  <option value="CLP">CLP – Peso chileno</option>
+                  <option value="GBP">GBP – British Pound</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+              </div>
               <div className="flex gap-1">
                 <button
                   onClick={handleCreateAccount}

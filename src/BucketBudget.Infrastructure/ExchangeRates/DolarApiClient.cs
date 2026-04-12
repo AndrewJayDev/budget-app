@@ -25,7 +25,11 @@ public class DolarApiClient
         var endpoints = new[]
         {
             ("oficial", ExchangeRateType.Official),
-            ("blue", ExchangeRateType.Blue)
+            ("blue", ExchangeRateType.Blue),
+            ("bolsa", ExchangeRateType.Mep),
+            ("contadoconliqui", ExchangeRateType.Ccl),
+            ("tarjeta", ExchangeRateType.Tarjeta),
+            ("cripto", ExchangeRateType.Cripto),
         };
 
         foreach (var (casa, rateType) in endpoints)

@@ -3,5 +3,9 @@ namespace BucketBudget.Domain.Enums;
 public enum ExchangeRateType
 {
     Official,
-    Blue
+    Blue,
+    Mep,
+    Ccl,
+    Tarjeta,
+    Cripto
 }

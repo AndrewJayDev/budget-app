@@ -5,9 +5,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const CURRENCY_LOCALE: Record<string, string> = {
+  ARS: 'es-AR',
+  USD: 'en-US',
+  EUR: 'de-DE',
+  BRL: 'pt-BR',
+  CLP: 'es-CL',
+  UYU: 'es-UY',
+}
+
+function localeForCurrency(currency: string): string {
+  return CURRENCY_LOCALE[currency] ?? 'en-US'
+}
+
 export function formatMilliunits(milliunits: number, currency = 'USD'): string {
   const amount = milliunits / 1000
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(localeForCurrency(currency), {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,

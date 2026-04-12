@@ -7,7 +7,7 @@ import {
 import { getTransactions, getAccounts, type TransactionDto, type AccountDto } from '@/lib/api'
 import { useBuckets } from '@/hooks/useBuckets'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
+import { cn, formatMilliunits } from '@/lib/utils'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16']
 
@@ -37,7 +37,8 @@ function monthsBetween(fromYm: string, toYm: string): string[] {
 }
 
 function fmtAmount(n: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n)
+  // Reuse the locale-aware formatting from utils, converting to milliunits
+  return formatMilliunits(Math.round(n * 1000), currency)
 }
 
 function startOfYear(): string {
